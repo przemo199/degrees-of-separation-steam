@@ -6,7 +6,7 @@ interface User {
 }
 
 const apiUrlBlueprint =
-  `http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={1}&steamid={0}&relationship=friend`;
+  `https://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={1}&steamid={0}&relationship=friend`;
 let apiUrlSubstituted = '';
 
 let requestsDone = 0;
