@@ -5,10 +5,7 @@ interface User {
   lowerDegreeFriend: string;
 }
 
-const apiUrlBlueprint =
-  `https://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={1}&steamid={0}&relationship=friend`;
-let apiUrlSubstituted = '';
-
+let apiKey;
 let requestsDone = 0;
 let privateProfileResponses = 0;
 let friendLevel = 0;
@@ -23,7 +20,10 @@ async function fetchUserFriends(id: string): Promise<User[]> {
     return [];
   }
 
-  const response = await fetch(apiUrlSubstituted.replace("{0}", id));
+  const response = await fetch("/api/fetch-friends", {
+    method: "POST",
+    body: JSON.stringify({apiKey: apiKey, steamId: id})
+  });
   requestsDone++;
   if (response.status === 200) {
     return (await response.json()).friendslist.friends.map((friend: { steamid: string; }) => ({steamId: friend.steamid, lowerDegreeFriend: id}));
@@ -153,8 +153,8 @@ function findPath(): string[] {
   return path;
 }
 
-async function startSearch(apiKey: string, steamId1: string, steamId2: string): Promise<number | false> {
-  apiUrlSubstituted = apiUrlBlueprint.replace('{1}', apiKey);
+async function startSearch(steamApiKey: string, steamId1: string, steamId2: string): Promise<number | false> {
+  apiKey = steamApiKey;
   return findDegreeOfSeparation(steamId1, steamId2);
 }
 
