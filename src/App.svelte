@@ -20,7 +20,7 @@
 </script>
 
 <main>
-  <NavBar />
+  <NavBar/>
 
   <div class="inline-label" style="text-align: right">
     <p>Steam API key:</p>
@@ -36,15 +36,14 @@
     <input type="text" bind:value={secondId}>
   </div>
 
-  <br />
+  <br/>
 
   <button class="find-button" on:click={handleClickEvent}>Find degree of separation</button>
 
-  <br />
+  <br/>
 
-  {#if searching}
-    searching
-    {result}
+  {#if result}
+    {"Degree of separation found: " + result}
   {/if}
 
 </main>
