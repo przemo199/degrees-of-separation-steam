@@ -6,12 +6,15 @@
   let firstId: string;
   let secondId: string;
   let searching = false;
-  let result;
+  let result = 0;
 
   async function handleClickEvent() {
     searching = !searching;
     if (steamApiKey && firstId && secondId) {
-      result = await startSearch(steamApiKey, firstId, secondId);
+      let degree = await startSearch(steamApiKey, firstId, secondId);
+      if (degree) {
+        result = degree;
+      }
     } else {
       alert('You need to fill all fields');
     }
