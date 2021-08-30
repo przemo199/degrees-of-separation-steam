@@ -8,8 +8,8 @@ module.exports = async (req: VercelRequest, res: VercelResponse) => {
   if (req.method === "POST") {
     apiUrl = apiUrl.replace("{0}", req.body.steamId);
     apiUrl = apiUrl.replace("{1}", req.body.apiKey);
-    const {statusCode, body} = await request(apiUrl);
-    res.status(statusCode).send(await body.json());
+    const {body} = await request(apiUrl);
+    res.status(200).send(await body.json());
   } else {
     res.status(405).send("Method Not Allowed");
   }
