@@ -13,7 +13,8 @@ module.exports = async (req: VercelRequest, res: VercelResponse) => {
     const {body} = await request(apiUrlFilled, {
       method: "GET",
       headers: {
-        "content-type": "application/json"}
+        "content-type": "application/json"
+      }
     });
     res.status(200).send(await body.json());
   } else {
