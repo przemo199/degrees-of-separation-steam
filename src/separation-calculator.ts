@@ -16,7 +16,8 @@ const friendLevelsA: User[][] = [];
 const friendLevelsB: User[][] = [];
 
 async function fetchUserFriends(id: string): Promise<User[]> {
-  if (requestsDone >= 100000) {
+  console.log("Fetching friends of: " + id);
+  if (requestsDone >= 100000 || tooManyRequests) {
     return [];
   }
 

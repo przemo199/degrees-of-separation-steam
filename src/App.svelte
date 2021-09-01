@@ -7,6 +7,7 @@
   let secondId: string;
   let searching = false;
   let result = 0;
+  let path = [];
 
   async function handleClickEvent() {
     searching = !searching;
@@ -14,6 +15,7 @@
       let degree = await startSearch(steamApiKey, firstId, secondId);
       if (degree) {
         result = degree;
+        path = findPath();
       }
     } else {
       alert('You need to fill all fields');
@@ -47,6 +49,7 @@
 
   {#if result}
     {"Degree of separation found: " + result}
+    {path}
   {/if}
 
 </main>
