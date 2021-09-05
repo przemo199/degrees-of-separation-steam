@@ -1,25 +1,38 @@
 <script lang="ts">
   import NavBar from "./components/NavBar.svelte";
-  import {startSearch, findPath} from "./separation-calculator"
 
   let steamApiKey: string;
   let firstId: string;
   let secondId: string;
-  let searching = false;
-  let result = 0;
-  let path = [];
+  let loading = false;
+  let degree = 0;
+  let path: string[] = [];
 
   async function handleClickEvent() {
-    searching = !searching;
-    if (steamApiKey && firstId && secondId) {
-      let degree = await startSearch(steamApiKey, firstId, secondId);
-      if (degree) {
-        result = degree;
-        path = findPath();
-      }
-    } else {
-      alert('You need to fill all fields');
+    if (steamApiKey.length !== 32 && firstId.length !== 17 && secondId.length !== 17) {
+      alert("Provided values have incorrect length");
+      return;
     }
+
+    loading = true;
+
+    console.log(steamApiKey);
+    console.log(firstId);
+    console.log(secondId);
+
+    const request = await fetch("/degree", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({apiKey: steamApiKey, steamId1: firstId, steamId2: secondId})
+    });
+
+    const result = await request.json();
+    if (result.degree) {
+      degree = result.degree;
+      path = result.path;
+    }
+
+    loading = false;
   }
 
 </script>
@@ -47,9 +60,14 @@
 
   <br/>
 
-  {#if result}
-    {"Degree of separation found: " + result}
-    {path}
+  {#if loading}
+    <h1>Loading...</h1>
+  {/if}
+
+  {#if degree && path.length !== 0}
+    {"Degree of separation: " + degree}
+    <br/>
+    {"Path discovered: " + path.join(", ")}
   {/if}
 
 </main>
@@ -99,7 +117,7 @@
   }
 
   h1 {
-    color: #ff3e00;
+    color: rgb(184, 182, 180);
     text-transform: uppercase;
     font-size: 4em;
     font-weight: 100;
