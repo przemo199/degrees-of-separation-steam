@@ -4,7 +4,7 @@
   let steamApiKey: string;
   let firstId: string;
   let secondId: string;
-  let loading = false;
+  let searching = false;
   let response = null;
 
   async function handleClickEvent() {
@@ -18,7 +18,7 @@
       return;
     }
 
-    loading = true;
+    searching = true;
 
     const request = await fetch("/degree", {
       method: "POST",
@@ -29,7 +29,7 @@
     response = await request.json();
     console.log(response);
 
-    loading = false;
+    searching = false;
   }
 
 </script>
@@ -56,12 +56,17 @@
   <button class="find-button" on:click={handleClickEvent}>Find degree of separation</button>
 
   <br/>
+  <br/>
 
-  {#if loading}
-    <h1>Loading...</h1>
+
+  {#if searching}
+    <div class="background">
+      <h1>Searching...</h1>
+    </div>
   {/if}
 
   {#if response !== null}
+    <div class="background">
     <p>
       {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
     </p>
@@ -82,7 +87,9 @@
         Daily limit of requests have been exhausted
       </p>
     {/if}
+    </div>
   {/if}
+
 
 </main>
 
@@ -101,6 +108,14 @@
 
   .inline-label {
     display: inline-block;
+  }
+
+  .background {
+    background-color: rgb(14,20,28);
+    display: inline-block;
+    padding: 7px;
+    text-align: left;
+    margin: 10px;
   }
 
   p {
