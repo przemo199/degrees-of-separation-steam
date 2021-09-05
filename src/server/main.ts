@@ -28,14 +28,8 @@ app.get("/", (req, res) => {
 app.post("/degree", async (req, res) => {
   if (req.method !== "POST") res.status(405).send("Method Not allowed");
   const calculator = new SeparationCalculator(req.body.apiKey);
-  const result = await calculator.findDegreeOfSeparation(req.body.steamId1, req.body.steamId2);
-  console.log(result);
-  console.log(calculator.findPath());
-  if (result) {
-    res.status(200).send({degree: result, path: calculator.findPath()});
-  } else {
-    res.status(200).send({degree: null});
-  }
+  const result = await calculator.performSearch(req.body.steamId1, req.body.steamId2);
+  res.status(200).send({...req.body, ...result});
 });
 
 const server = http.createServer(app);

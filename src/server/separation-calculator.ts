@@ -5,14 +5,24 @@ interface User {
   lowerDegreeFriend: string;
 }
 
+interface SearchResult {
+  degreeOfSeparation: number | null;
+  path: string[] | null;
+  requestsDone: number;
+  uniqueProfilesFetched: number;
+  searchDuration: number;
+  tooManyRequests: boolean;
+}
+
 class SeparationCalculator {
   private apiUrlBlueprint: string;
   private requestsDone: number;
   private privateProfileResponses: number;
   private friendLevel: number;
-  private usersFetched: number;
+  private uniqueProfilesFetched: number;
   private commonFriend: string;
   private tooManyRequests: boolean;
+  private path: string[];
   friendLevelsA: User[][];
   friendLevelsB: User[][];
 
@@ -22,9 +32,10 @@ class SeparationCalculator {
     this.requestsDone = 0;
     this.privateProfileResponses = 0;
     this.friendLevel = 0;
-    this.usersFetched = 0;
+    this.uniqueProfilesFetched = 0;
     this.commonFriend = "";
     this.tooManyRequests = false;
+    this.path = [];
     this.friendLevelsA = [];
     this.friendLevelsB = [];
   }
@@ -75,65 +86,17 @@ class SeparationCalculator {
     });
 
     const nextDegree = uniqueFetched.filter(user => isDuplicate(user.steamId) ? null : user);
-    this.usersFetched += nextDegree.length;
+    this.uniqueProfilesFetched += nextDegree.length;
     arr[this.friendLevel] = nextDegree;
   }
 
-  searchCurrentDegree(friendLevelsToSearchBy: User[][], friendLevelsToBeSearched: User[][]) {
+  searchCurrentLevel(friendLevelsToSearchBy: User[][], friendLevelsToBeSearched: User[][]) {
     for (const level of friendLevelsToBeSearched) {
       for (const user of friendLevelsToSearchBy[this.friendLevel]) {
         if (level.map(usr => usr.steamId).includes(user.steamId)) {
           return user.steamId;
         }
       }
-    }
-
-    return false;
-  }
-
-  findDegreeById(id: string): number {
-    let result = 0;
-    for (let i = 0; i < this.friendLevelsA.length; i++) {
-      if ((this.friendLevelsA)[i].map(user => user.steamId).includes(id)) {
-        result += i;
-        break;
-      }
-    }
-    for (let i = 0; i < this.friendLevelsA.length; i++) {
-      if ((this.friendLevelsB)[i].map(user => user.steamId).includes(id)) {
-        result += i;
-        break;
-      }
-    }
-
-    return result;
-  }
-
-  async findDegreeOfSeparation(userA: string, userB: string) {
-    (this.friendLevelsA)[this.friendLevel] = [{steamId: userA, lowerDegreeFriend: ""}];
-    this.friendLevelsB[this.friendLevel] = [{steamId: userB, lowerDegreeFriend: ""}];
-    this.friendLevel++;
-
-    while (!this.tooManyRequests) {
-      await this.fetchNextFriendLevel(this.friendLevelsA);
-      if ((this.friendLevelsA)[this.friendLevel].length === 0) {
-        return false;
-      }
-      let result = this.searchCurrentDegree(this.friendLevelsA, this.friendLevelsB);
-      if (result) {
-        this.commonFriend = result;
-        return this.findDegreeById(result);
-      }
-      await this.fetchNextFriendLevel(this.friendLevelsB);
-      if ((this.friendLevelsB)[this.friendLevel].length === 0) {
-        return false;
-      }
-      result = this.searchCurrentDegree(this.friendLevelsB, this.friendLevelsA);
-      if (result) {
-        this.commonFriend = result;
-        return this.findDegreeById(result);
-      }
-      this.friendLevel++;
     }
 
     return false;
@@ -167,6 +130,49 @@ class SeparationCalculator {
     }
 
     return path;
+  }
+
+  async performSearch(userA: string, userB: string): Promise<SearchResult> {
+    const generateSearchResult = () => {
+      return {
+        degreeOfSeparation: this.path.length > 0 ? this.path.length - 1 : null,
+        path: this.path.length > 0 ? this.path : null,
+        requestsDone: this.requestsDone,
+        uniqueProfilesFetched: this.uniqueProfilesFetched,
+        searchDuration: new Date().getTime() - startTime,
+        tooManyRequests: this.tooManyRequests
+      };
+    }
+    const startTime = new Date().getTime();
+    this.friendLevelsA[this.friendLevel] = [{steamId: userA, lowerDegreeFriend: ""}];
+    this.friendLevelsB[this.friendLevel] = [{steamId: userB, lowerDegreeFriend: ""}];
+    this.friendLevel++;
+
+    while (!this.tooManyRequests) {
+      await this.fetchNextFriendLevel(this.friendLevelsA);
+      if ((this.friendLevelsA)[this.friendLevel].length === 0) {
+        return generateSearchResult();
+      }
+      let result = this.searchCurrentLevel(this.friendLevelsA, this.friendLevelsB);
+      if (result) {
+        this.commonFriend = result;
+        this.path = this.findPath();
+        return generateSearchResult();
+      }
+      await this.fetchNextFriendLevel(this.friendLevelsB);
+      if ((this.friendLevelsB)[this.friendLevel].length === 0) {
+        return generateSearchResult();
+      }
+      result = this.searchCurrentLevel(this.friendLevelsB, this.friendLevelsA);
+      if (result) {
+        this.commonFriend = result;
+        this.path = this.findPath();
+        return generateSearchResult();
+      }
+      this.friendLevel++;
+    }
+
+    return generateSearchResult();
   }
 }
 

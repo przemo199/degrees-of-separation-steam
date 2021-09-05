@@ -5,10 +5,14 @@
   let firstId: string;
   let secondId: string;
   let loading = false;
-  let degree = 0;
-  let path: string[] = [];
+  let response = null;
 
   async function handleClickEvent() {
+    if (!steamApiKey || !firstId || !secondId) {
+      alert("You need to provide all the values");
+      return;
+    }
+
     if (steamApiKey.length !== 32 && firstId.length !== 17 && secondId.length !== 17) {
       alert("Provided values have incorrect length");
       return;
@@ -16,21 +20,14 @@
 
     loading = true;
 
-    console.log(steamApiKey);
-    console.log(firstId);
-    console.log(secondId);
-
     const request = await fetch("/degree", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({apiKey: steamApiKey, steamId1: firstId, steamId2: secondId})
     });
 
-    const result = await request.json();
-    if (result.degree) {
-      degree = result.degree;
-      path = result.path;
-    }
+    response = await request.json();
+    console.log(response);
 
     loading = false;
   }
@@ -64,10 +61,27 @@
     <h1>Loading...</h1>
   {/if}
 
-  {#if degree && path.length !== 0}
-    {"Degree of separation: " + degree}
-    <br/>
-    {"Path discovered: " + path.join(", ")}
+  {#if response !== null}
+    <p>
+      {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
+    </p>
+    <p>
+      {"Path discovered: " + (response.path === null ? "not found" : response.path)}
+    </p>
+    <p>
+      {"Requests done: " + response.requestsDone}
+    </p>
+    <p>
+      {"Unique profiles fetched: " + response.uniqueProfilesFetched}
+    </p>
+    <p>
+      {"Search duration: " + response.searchDuration/1000 + "s"}
+    </p>
+    {#if response.tooManyRequests === true}
+      <p>
+        Daily limit of requests have been exhausted
+      </p>
+    {/if}
   {/if}
 
 </main>
