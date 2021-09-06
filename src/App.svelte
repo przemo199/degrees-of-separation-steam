@@ -65,7 +65,7 @@
     </div>
   {/if}
 
-  {#if response !== null}
+  {#if response !== null && !searching}
     <div class="background">
     <p>
       {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
