@@ -24,6 +24,10 @@
     "tslib": "^2.0.0",
     "typescript": "4.3.5"
   },
+  "engines": {
+    "node": "16.x",
+    "npm": "7.x"
+  },
   "private": true,
   "scripts": {
     "build": "rollup -c",

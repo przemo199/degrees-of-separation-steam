@@ -20,7 +20,7 @@
 
     searching = true;
 
-    const request = await fetch("/degree", {
+    const request = await fetch("/api/degree", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({apiKey: steamApiKey, steamId1: firstId, steamId2: secondId})
@@ -64,23 +64,23 @@
 
   {#if response !== null && !searching}
     <div class="background">
-      <p>
+      <p class="message">
         {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
       </p>
-      <p>
-        {"Path discovered: " + (response.path === null ? "not found" : response.path)}
+      <p class="message">
+        {"Path discovered: " + (response.path === null ? "not found" : response.path.join(", "))}
       </p>
-      <p>
+      <p class="message">
         {"Requests done: " + response.requestsDone}
       </p>
-      <p>
+      <p class="message">
         {"Unique profiles fetched: " + response.uniqueProfilesFetched}
       </p>
-      <p>
+      <p class="message">
         {"Search duration: " + response.searchDuration/1000 + "s"}
       </p>
       {#if response.tooManyRequests === true}
-        <p>
+        <p class="message">
           Daily limit of requests have been exhausted
         </p>
       {/if}
@@ -112,6 +112,10 @@
     padding: 12px;
     text-align: left;
     margin: 10px;
+  }
+
+  p.message {
+    margin: 5px;
   }
 
   .label {

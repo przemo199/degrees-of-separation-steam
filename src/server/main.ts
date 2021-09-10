@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
 
-app.post("/degree", async (req, res) => {
+app.post("/api/degree", async (req, res) => {
   if (req.method !== "POST") res.status(405).send("Method Not allowed");
   const calculator = new SeparationCalculator(req.body.apiKey);
   const result = await calculator.performSearch(req.body.steamId1, req.body.steamId2);
