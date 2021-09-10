@@ -27,11 +27,9 @@
     });
 
     response = await request.json();
-    console.log(response);
 
     searching = false;
   }
-
 </script>
 
 <main>
@@ -45,9 +43,9 @@
 
   <div class="inline">
     <input type="text" bind:value={steamApiKey}>
-    <br>
+    <br/>
     <input type="text" bind:value={firstId}>
-    <br>
+    <br/>
     <input type="text" bind:value={secondId}>
   </div>
 
@@ -57,7 +55,6 @@
 
   <br/>
   <br/>
-
 
   {#if searching}
     <div class="background">
@@ -89,7 +86,6 @@
     {/if}
     </div>
   {/if}
-
 
 </main>
 
