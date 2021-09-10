@@ -36,9 +36,9 @@
   <NavBar/>
 
   <div class="inline-label" style="text-align: right">
-    <p>Steam API key:</p>
-    <p>Steam ID of the first profile:</p>
-    <p>Steam ID of the second profile:</p>
+    <p class="label">Steam API key:</p>
+    <p class="label">Steam ID of the first profile:</p>
+    <p class="label">Steam ID of the second profile:</p>
   </div>
 
   <div class="inline">
@@ -64,26 +64,26 @@
 
   {#if response !== null && !searching}
     <div class="background">
-    <p>
-      {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
-    </p>
-    <p>
-      {"Path discovered: " + (response.path === null ? "not found" : response.path)}
-    </p>
-    <p>
-      {"Requests done: " + response.requestsDone}
-    </p>
-    <p>
-      {"Unique profiles fetched: " + response.uniqueProfilesFetched}
-    </p>
-    <p>
-      {"Search duration: " + response.searchDuration/1000 + "s"}
-    </p>
-    {#if response.tooManyRequests === true}
       <p>
-        Daily limit of requests have been exhausted
+        {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
       </p>
-    {/if}
+      <p>
+        {"Path discovered: " + (response.path === null ? "not found" : response.path)}
+      </p>
+      <p>
+        {"Requests done: " + response.requestsDone}
+      </p>
+      <p>
+        {"Unique profiles fetched: " + response.uniqueProfilesFetched}
+      </p>
+      <p>
+        {"Search duration: " + response.searchDuration/1000 + "s"}
+      </p>
+      {#if response.tooManyRequests === true}
+        <p>
+          Daily limit of requests have been exhausted
+        </p>
+      {/if}
     </div>
   {/if}
 
@@ -109,12 +109,12 @@
   .background {
     background-color: rgb(14,20,28);
     display: inline-block;
-    padding: 7px;
+    padding: 12px;
     text-align: left;
     margin: 10px;
   }
 
-  p {
+  .label {
     margin-bottom: 23px;
     margin-right: 10px;
   }
