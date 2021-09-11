@@ -4,7 +4,9 @@
 
 <nav>
   <p>Degrees of separation among Steam users</p>
-  <Clock ref="clock" />
+  <div class="clock">
+    <Clock />
+  </div>
 </nav>
 
 <style>
@@ -25,8 +27,7 @@
     display: inline-block;
   }
 
-  :global([ref=clock]) {
-    display: inline-block;
+  .clock {
     float: right;
     margin: auto 3% auto auto;
   }

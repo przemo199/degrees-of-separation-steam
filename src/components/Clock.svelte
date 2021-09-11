@@ -1,6 +1,5 @@
 <script lang="ts">
   import {onMount} from "svelte";
-  export let ref;
 
   let time = new Date();
 
@@ -15,5 +14,10 @@
   });
 </script>
 
-<p {ref}>{time.toLocaleTimeString()}</p>
+<p class="clock">{time.toLocaleTimeString()}</p>
 
+<style>
+  .clock {
+    margin: 0;
+  }
+</style>
