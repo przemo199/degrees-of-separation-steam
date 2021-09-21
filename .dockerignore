@@ -1,0 +1,8 @@
+.http
+/node_modules
+/npm-debug.log
+/.idea
+/.vscode
+/*.iml
+/server-dist
+/public/build

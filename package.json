@@ -31,12 +31,13 @@
   "private": true,
   "scripts": {
     "build": "rollup -c",
+    "build-all": "npm run build && npm run build-server",
     "build-server": "cd ./src/server && tsc",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev": "rollup -c -w",
     "heroku-postbuild": "npm run build && npm run build-server",
     "start": "sirv public --no-clear",
-    "start-server": "npm run build && npm run build-server && node ./server-dist/main.js"
+    "start-server": "node ./server-dist/main.js"
   },
   "type": "module"
 }
