@@ -1,6 +1,6 @@
 # [Degrees of Separation Between Steam Users](https://degrees-of-separation-steam.herokuapp.com/)  
 
-A website that allows you to check the degree of separation between two Steam users.
+A website built using Svelte with Node.js backend that allows you to check the degree of separation between two Steam users.
 
 ## Usage
 
