@@ -1,11 +1,12 @@
 <script lang="ts">
   import NavBar from "./components/NavBar.svelte";
+  import type {SearchResult} from './interfaces';
 
   let steamApiKey: string;
   let firstId: string;
   let secondId: string;
-  let searching = false;
-  let response = null;
+  let searching: boolean = false;
+  let data = null;
 
   async function handleClickEvent() {
     if (!steamApiKey || !firstId || !secondId) {
@@ -14,19 +15,32 @@
     }
 
     if (steamApiKey.length !== 32 && firstId.length !== 17 && secondId.length !== 17) {
-      alert("Provided values have incorrect length");
+      alert("Provided values are incorrect");
       return;
     }
 
+    data = null;
     searching = true;
 
-    const request = await fetch("/api/degree", {
+    const response = await fetch("/api/degree", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({apiKey: steamApiKey, steamId1: firstId, steamId2: secondId})
     });
 
-    response = await request.json();
+    if (response.ok) {
+      const responseBody: SearchResult = await response.json();
+      data = {
+        degreeOfSeparation: responseBody.degreeOfSeparation === null ? "not found" : responseBody.degreeOfSeparation,
+        path: responseBody.path === null ? "not found" : responseBody.path.join(", "),
+        requestsDone: responseBody.requestsDone,
+        uniqueProfilesFetched: responseBody.uniqueProfilesFetched,
+        searchDuration: (responseBody.searchDuration / 1000) + "s",
+        tooManyRequests: responseBody.tooManyRequests
+      }
+    } else {
+      alert(response.status + " " + response.statusText);
+    }
 
     searching = false;
   }
@@ -51,7 +65,9 @@
 
   <br/>
 
-  <button class="find-button" on:click={handleClickEvent}>Find degree of separation</button>
+  <button class="find-button" on:click={handleClickEvent}>
+    Find degree of separation
+  </button>
 
   <br/>
   <br/>
@@ -60,28 +76,26 @@
     <div class="background">
       <h1>Searching...</h1>
     </div>
-  {/if}
-
-  {#if response !== null && !searching}
+  {:else if data !== null}
     <div class="background">
       <p class="message">
-        {"Degree of separation: " + (response.degreeOfSeparation === null ? "not found" : response.degreeOfSeparation)}
+        {"Degree of separation: " + data.degreeOfSeparation}
       </p>
       <p class="message">
-        {"Path discovered: " + (response.path === null ? "not found" : response.path.join(", "))}
+        {"Path discovered: " + data.path}
       </p>
       <p class="message">
-        {"Requests done: " + response.requestsDone}
+        {"Requests done: " + data.requestsDone}
       </p>
       <p class="message">
-        {"Unique profiles fetched: " + response.uniqueProfilesFetched}
+        {"Unique profiles fetched: " + data.uniqueProfilesFetched}
       </p>
       <p class="message">
-        {"Search duration: " + response.searchDuration/1000 + "s"}
+        {"Search duration: " + data.searchDuration}
       </p>
-      {#if response.tooManyRequests === true}
+      {#if data.tooManyRequests === true}
         <p class="message">
-          Daily limit of requests have been exhausted
+          Daily requests limit have been exhausted
         </p>
       {/if}
     </div>
@@ -151,10 +165,4 @@
     font-size: 4em;
     font-weight: 100;
   }
-
-  /*@media (min-width: 640px) {*/
-  /*  main {*/
-  /*    max-width: none;*/
-  /*  }*/
-  /*}*/
 </style>

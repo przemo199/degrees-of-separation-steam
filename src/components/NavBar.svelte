@@ -3,9 +3,9 @@
 </script>
 
 <nav>
-  <p>Degrees of separation among Steam users</p>
+  <p>Degrees of separation between Steam users</p>
   <div class="clock">
-    <Clock />
+    <Clock/>
   </div>
 </nav>
 

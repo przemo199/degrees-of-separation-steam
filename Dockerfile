@@ -4,10 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install
-
-RUN npm run build-all
+RUN npm install && npm run build-all
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "start-server" ]
+CMD ["npm", "run", "start-server"]
