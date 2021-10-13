@@ -14,8 +14,8 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
-app.use(express.static(path.join(dirname, "..", "public", "build")));
-app.use(express.static(path.join(dirname, "..", "public")));
+app.use(express.static("./public/build"));
+app.use(express.static("./public/"));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(dirname, "..", "public", "index.html"));

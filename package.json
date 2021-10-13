@@ -37,7 +37,7 @@
     "dev": "rollup -c -w",
     "heroku-postbuild": "npm run build && npm run build-server",
     "start": "sirv public --no-clear",
-    "start-server": "node server-dist/main.js"
+    "start-server": "node server-dist/server/main.js"
   },
   "type": "module"
 }
