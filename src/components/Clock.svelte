@@ -1,7 +1,7 @@
 <script lang="ts">
   import {onMount} from "svelte";
 
-  let time = new Date();
+  let time: Date = new Date();
 
   onMount(() => {
     const interval = setInterval(() => {

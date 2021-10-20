@@ -1,7 +1,8 @@
 import {request} from "undici";
-import {SearchResult, User} from '../interfaces';
+import {SearchResult, User} from "../interfaces";
 
 class SeparationCalculator {
+  private apiKey: string;
   private apiUrlBlueprint: string;
   private requestsDone: number;
   private privateProfileResponses: number;
@@ -14,6 +15,7 @@ class SeparationCalculator {
   friendLevelsB: User[][];
 
   constructor(steamApiKey: string) {
+    this.apiKey = steamApiKey;
     this.apiUrlBlueprint =
       `http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=${steamApiKey}&steamid={0}&relationship=friend`;
     this.requestsDone = 0;
@@ -27,12 +29,20 @@ class SeparationCalculator {
     this.friendLevelsB = [];
   }
 
+  buildUrl(id: string): URL {
+    const url = new URL("https://api.steampowered.com/ISteamUser/GetFriendList/v0001/");
+    url.searchParams.set("key", this.apiKey);
+    url.searchParams.set("steamid", id);
+    url.searchParams.set("relationship", "friend");
+    return url;
+  }
+
   async fetchUserFriends(id: string): Promise<User[]> {
     if (this.requestsDone >= 100000) {
       return [];
     }
 
-    const {statusCode, body} = await request(this.apiUrlBlueprint.replace("{0}", id));
+    const {statusCode, body} = await request(this.buildUrl(id));
 
     this.requestsDone++;
     if (statusCode === 200) {

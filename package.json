@@ -4,8 +4,8 @@
   "author": "Przemek Kaminski <przemyslaw.m.kaminski@gmail.com> (https://www.linkedin.com/in/przemekkaminski/)",
   "dependencies": {
     "express": "^4.17.1",
-    "undici": "^4.5.0",
-    "sirv-cli": "^1.0.0"
+    "sirv-cli": "^1.0.0",
+    "undici": "^4.5.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -26,7 +26,7 @@
   },
   "engines": {
     "node": "16.x",
-    "npm": "7.x"
+    "npm": "8.x"
   },
   "private": true,
   "scripts": {
@@ -35,9 +35,9 @@
     "build-server": "cd ./src/server && tsc",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev": "rollup -c -w",
-    "heroku-postbuild": "npm run build && npm run build-server",
+    "heroku-postbuild": "npm run build all",
     "start": "sirv public --no-clear",
-    "start-server": "node server-dist/server/main.js"
+    "start-server": "node server-dist/server/server.js"
   },
   "type": "module"
 }

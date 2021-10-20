@@ -1,6 +1,7 @@
 <script lang="ts">
   import NavBar from "./components/NavBar.svelte";
-  import type {SearchResult} from './interfaces';
+  import {SearchResult} from './interfaces';
+  import PathShowcase from './components/PathShowcase.svelte';
 
   let steamApiKey: string;
   let firstId: string;
@@ -22,21 +23,21 @@
     data = null;
     searching = true;
 
-    const response = await fetch("/api/degree", {
+    const response = await fetch("/api/find-degree", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({apiKey: steamApiKey, steamId1: firstId, steamId2: secondId})
     });
 
     if (response.ok) {
-      const responseBody: SearchResult = await response.json();
+      const searchResult: SearchResult = await response.json();
       data = {
-        degreeOfSeparation: responseBody.degreeOfSeparation === null ? "not found" : responseBody.degreeOfSeparation,
-        path: responseBody.path === null ? "not found" : responseBody.path.join(", "),
-        requestsDone: responseBody.requestsDone,
-        uniqueProfilesFetched: responseBody.uniqueProfilesFetched,
-        searchDuration: (responseBody.searchDuration / 1000) + "s",
-        tooManyRequests: responseBody.tooManyRequests
+        degreeOfSeparation: searchResult.degreeOfSeparation === null ? "not found" : searchResult.degreeOfSeparation,
+        path: searchResult.path === null ? "not found" : searchResult.path,
+        requestsDone: searchResult.requestsDone,
+        uniqueProfilesFetched: searchResult.uniqueProfilesFetched,
+        searchDuration: (searchResult.searchDuration / 1000) + "s",
+        tooManyRequests: searchResult.tooManyRequests
       }
     } else {
       alert(response.status + " " + response.statusText);
@@ -82,7 +83,7 @@
         {"Degree of separation: " + data.degreeOfSeparation}
       </p>
       <p class="message">
-        {"Path discovered: " + data.path}
+        {"Connection path discovered: " + data.path.join(", ")}
       </p>
       <p class="message">
         {"Requests done: " + data.requestsDone}
@@ -98,6 +99,7 @@
           Daily requests limit have been exhausted
         </p>
       {/if}
+      <PathShowcase steamApiKey={steamApiKey} steamIds={data.path}/>
     </div>
   {/if}
 
