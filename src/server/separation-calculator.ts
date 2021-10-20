@@ -2,8 +2,7 @@ import {request} from "undici";
 import {SearchResult, User} from "../interfaces";
 
 class SeparationCalculator {
-  private apiKey: string;
-  private apiUrlBlueprint: string;
+  private readonly apiKey: string;
   private requestsDone: number;
   private privateProfileResponses: number;
   private friendsLevel: number;
@@ -16,8 +15,6 @@ class SeparationCalculator {
 
   constructor(steamApiKey: string) {
     this.apiKey = steamApiKey;
-    this.apiUrlBlueprint =
-      `http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=${steamApiKey}&steamid={0}&relationship=friend`;
     this.requestsDone = 0;
     this.privateProfileResponses = 0;
     this.friendsLevel = 0;
@@ -29,20 +26,18 @@ class SeparationCalculator {
     this.friendLevelsB = [];
   }
 
-  buildUrl(id: string): URL {
-    const url = new URL("https://api.steampowered.com/ISteamUser/GetFriendList/v0001/");
-    url.searchParams.set("key", this.apiKey);
-    url.searchParams.set("steamid", id);
-    url.searchParams.set("relationship", "friend");
-    return url;
-  }
-
   async fetchUserFriends(id: string): Promise<User[]> {
     if (this.requestsDone >= 100000) {
       return [];
     }
 
-    const {statusCode, body} = await request(this.buildUrl(id));
+    const friendsListSteamApiEndpoint = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/";
+    const url = new URL(friendsListSteamApiEndpoint);
+    url.searchParams.set("key", this.apiKey);
+    url.searchParams.set("steamid", id);
+    url.searchParams.set("relationship", "friend");
+
+    const {statusCode, body} = await request(id);
 
     this.requestsDone++;
     if (statusCode === 200) {
@@ -101,34 +96,34 @@ class SeparationCalculator {
     return false;
   }
 
-  findPath(): string[] {
+  findConnectionPath(): string[] {
     let targetId = this.commonFriend;
-    const path: string[] = [];
+    const connectionPath: string[] = [];
 
     while (targetId !== "") {
       for (const level of this.friendLevelsA) {
         const targetIndex = level.map(user => user.steamId).indexOf(targetId);
         if (targetIndex > -1) {
-          path.unshift(level[targetIndex].steamId);
+          connectionPath.unshift(level[targetIndex].steamId);
           targetId = level[targetIndex].lowerLevelFriend;
         }
       }
     }
 
-    path.pop(); // removing commonFriend to avoid duplicate values in the array
+    connectionPath.pop(); // removing commonFriend to avoid duplicate values in the array
 
     targetId = this.commonFriend;
     while (targetId !== "") {
       for (const level of this.friendLevelsB) {
         const targetIndex = level.map(user => user.steamId).indexOf(targetId);
         if (targetIndex > -1) {
-          path.push(level[targetIndex].steamId);
+          connectionPath.push(level[targetIndex].steamId);
           targetId = level[targetIndex].lowerLevelFriend;
         }
       }
     }
 
-    return path;
+    return connectionPath;
   }
 
   async findDegreeOfSeparation(userA: string, userB: string): Promise<SearchResult> {
@@ -156,7 +151,7 @@ class SeparationCalculator {
       let result = this.searchCurrentLevel(this.friendLevelsA, this.friendLevelsB);
       if (result) {
         this.commonFriend = result;
-        this.path = this.findPath();
+        this.path = this.findConnectionPath();
         return generateSearchResult();
       }
 
@@ -168,7 +163,7 @@ class SeparationCalculator {
       result = this.searchCurrentLevel(this.friendLevelsB, this.friendLevelsA);
       if (result) {
         this.commonFriend = result;
-        this.path = this.findPath();
+        this.path = this.findConnectionPath();
         return generateSearchResult();
       }
 

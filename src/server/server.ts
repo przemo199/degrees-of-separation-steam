@@ -51,7 +51,8 @@ server.listen(PORT, () => {
 });
 
 async function fetchProfilesData(steamApiKey: string, steamIds: string[]): Promise<ProfileData[]> {
-  const url = new URL("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/");
+  const profileSummarySteamApiEndpoint = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
+  const url = new URL(profileSummarySteamApiEndpoint);
   url.searchParams.set("key", steamApiKey);
   url.searchParams.set("steamids", steamIds.join(","));
 

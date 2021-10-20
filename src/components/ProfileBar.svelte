@@ -10,9 +10,9 @@
     {#if profileData.realName}
       <p>{profileData.realName}</p>
     {/if}
-    <p>{profileData.steamId}</p>
+    <p>Steam ID: {profileData.steamId}</p>
     <p>User state: {profileData.userState}</p>
-    <p>Last log off: {profileData.lastLogOff}</p>
+    <p>Last log off: {new Date(profileData.lastLogOff * 1000).toLocaleString().replace(",", "")}</p>
   </div>
 </a>
 
@@ -41,5 +41,7 @@
     display: flex;
     flex-direction: column;
     margin-left: 20px;
+    margin-right: 20px;
+    align-self: stretch;
   }
 </style>
