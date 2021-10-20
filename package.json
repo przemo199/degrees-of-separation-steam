@@ -35,7 +35,7 @@
     "build-server": "cd ./src/server && tsc",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev": "rollup -c -w",
-    "heroku-postbuild": "npm run build all",
+    "heroku-postbuild": "npm run build-all",
     "start": "sirv public --no-clear",
     "start-server": "node server-dist/server/server.js"
   },
