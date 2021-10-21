@@ -37,7 +37,7 @@ class SeparationCalculator {
     url.searchParams.set("steamid", id);
     url.searchParams.set("relationship", "friend");
 
-    const {statusCode, body} = await request(id);
+    const {statusCode, body} = await request(url);
 
     this.requestsDone++;
     if (statusCode === 200) {

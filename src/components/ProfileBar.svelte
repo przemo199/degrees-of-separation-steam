@@ -1,6 +1,16 @@
 <script lang="ts">
   import {ProfileData} from "../interfaces";
   export let profileData: ProfileData;
+
+  enum UserState {
+    0 = "Offline",
+    1 = "Online",
+    2 = "Busy",
+    3 = "Away",
+    4 = "Snooze",
+    5 = "Looking to trade",
+    6 = "Looking to play"
+  }
 </script>
 
 <a class="profile-bar" href={profileData.profileUrl} target="_blank">
@@ -11,7 +21,7 @@
       <p>{profileData.realName}</p>
     {/if}
     <p>Steam ID: {profileData.steamId}</p>
-    <p>User state: {profileData.userState}</p>
+    <p>User state: {UserState[profileData.userState]}</p>
     <p>Last log off: {new Date(profileData.lastLogOff * 1000).toLocaleString().replace(",", "")}</p>
   </div>
 </a>
