@@ -8,7 +8,6 @@ import {ProfileData, RawProfileData} from "../interfaces";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 app.use(express.urlencoded({
   extended: true
@@ -18,10 +17,6 @@ app.use(express.json());
 
 app.use(express.static("./public/build"));
 app.use(express.static("./public/"));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(dirname, "..", "public", "index.html"));
-});
 
 app.post("/api/find-degree", async (req, res) => {
   if (req.method !== "POST") res.status(405).send("Method Not allowed");
@@ -61,7 +56,7 @@ async function fetchProfilesData(steamApiKey: string, steamIds: string[]): Promi
   if (statusCode === 200) {
     const profilesData: RawProfileData[] = (await body.json()).response.players;
 
-    const profiles =  profilesData.map(profile => {
+    const profiles = profilesData.map(profile => {
       return {
         profileName: profile.personaname,
         realName: profile.realname,

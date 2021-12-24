@@ -1,8 +1,10 @@
 <script lang="ts">
   import {onMount} from "svelte";
   import ProfileBar from "./ProfileBar.svelte";
+
   export let steamApiKey: string;
   export let steamIds: string[];
+
   let profilesData = [];
 
   onMount(async () => {
@@ -18,7 +20,7 @@
 
 <div>
   {#each profilesData as profileData}
-    <ProfileBar {profileData}/>
+    <ProfileBar {profileData} />
   {/each}
 </div>
 

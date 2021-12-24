@@ -1,5 +1,6 @@
 <script lang="ts">
   import {ProfileData} from "../interfaces";
+
   export let profileData: ProfileData;
 
   enum UserState {

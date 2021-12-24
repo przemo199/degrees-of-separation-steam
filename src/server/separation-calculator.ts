@@ -1,33 +1,33 @@
 import {request} from "undici";
-import {SearchResult, User} from "../interfaces";
+import {SearchResult} from "../interfaces";
 
 class SeparationCalculator {
   private readonly apiKey: string;
   private requestsDone: number;
   private privateProfileResponses: number;
-  private friendsLevel: number;
   private uniqueProfilesFetched: number;
-  private commonFriend: string;
   private tooManyRequests: boolean;
   private path: string[];
-  friendLevelsA: User[][];
-  friendLevelsB: User[][];
+  currentFriendsLevelA: string[];
+  currentFriendsLevelB: string[];
+  friendConnectionsA: Map<string, string>;
+  friendConnectionsB: Map<string, string>;
 
   constructor(steamApiKey: string) {
     this.apiKey = steamApiKey;
     this.requestsDone = 0;
     this.privateProfileResponses = 0;
-    this.friendsLevel = 0;
     this.uniqueProfilesFetched = 0;
-    this.commonFriend = "";
     this.tooManyRequests = false;
     this.path = [];
-    this.friendLevelsA = [];
-    this.friendLevelsB = [];
+    this.currentFriendsLevelA = [];
+    this.currentFriendsLevelB = [];
+    this.friendConnectionsA = new Map<string, string>();
+    this.friendConnectionsB = new Map<string, string>();
   }
 
-  async fetchUserFriends(id: string): Promise<User[]> {
-    if (this.requestsDone >= 100000) {
+  async fetchUserFriends(id: string): Promise<string[]> {
+    if (this.tooManyRequests) {
       return [];
     }
 
@@ -38,88 +38,65 @@ class SeparationCalculator {
     url.searchParams.set("relationship", "friend");
 
     const {statusCode, body} = await request(url);
-
     this.requestsDone++;
-    if (statusCode === 200) {
-      return (await body.json()).friendslist.friends.map((friend: { steamid: string; }) => ({
-        steamId: friend.steamid,
-        lowerLevelFriend: id
-      }));
-    } else if (statusCode === 401) {
-      this.privateProfileResponses++;
-    } else if (statusCode === 429) {
-      this.tooManyRequests = true;
-      console.log("Too many requests");
-    } else {
-      console.log("Response has invalid status code: " + statusCode);
+
+    switch (statusCode) {
+      case 200:
+        return (await body.json()).friendslist.friends.map((friend: any) => friend.steamid);
+      case 401:
+        this.privateProfileResponses++;
+        break;
+      case 429:
+        this.tooManyRequests = true;
+        console.log("Too many requests");
+        break;
+      default:
+        console.log("Invalid status code: " + statusCode);
     }
 
     return [];
   }
 
-  async fetchNextFriendLevel(users: User[][]) {
-    function isUnique(s: string): boolean {
-      for (const userLevel of users) {
-        if (userLevel.map(user => user.steamId).includes(s)) {
-          return false;
+  async fetchNextFriendLevel(users: string[], userMap: Map<string, string>): Promise<string[]> {
+    const promises = users.map(async user => {
+      const friends = await this.fetchUserFriends(user);
+      const result: string[] = []
+      friends.forEach(friend => {
+        if (!userMap.has(friend)) {
+          userMap.set(friend, user);
+          result.push(friend);
+          this.uniqueProfilesFetched++;
         }
-      }
-      return true;
-    }
-
-    const fetchedFriends = (await Promise.all(users[this.friendsLevel - 1]
-      .map(user => this.fetchUserFriends(user.steamId)))).flat();
-    const uniqueFetchedFriends: User[] = [];
-    const tempSet = new Set();
-    fetchedFriends.forEach(user => {
-      let num = tempSet.size;
-      tempSet.add(user.steamId);
-      if (num !== tempSet.size) {
-        uniqueFetchedFriends.push(user);
-      }
+      });
+      return result;
     });
 
-    const nextFriendsLevel = uniqueFetchedFriends.filter(user => isUnique(user.steamId));
-    this.uniqueProfilesFetched += nextFriendsLevel.length;
-    users[this.friendsLevel] = nextFriendsLevel;
+    return (await Promise.all(promises)).flat();
   }
 
-  searchCurrentLevel(friendLevelsToSearchBy: User[][], friendLevelsToBeSearched: User[][]) {
-    for (const level of friendLevelsToBeSearched) {
-      for (const user of friendLevelsToSearchBy[this.friendsLevel]) {
-        if (level.map(usr => usr.steamId).includes(user.steamId)) {
-          return user.steamId;
-        }
+  searchCurrentLevel(currentLevel: string[], mapToSearch: Map<string, string>): string | false {
+    for (const friend of currentLevel) {
+      if (mapToSearch.has(friend)) {
+        return friend
       }
     }
-
     return false;
   }
 
-  findConnectionPath(): string[] {
-    let targetId = this.commonFriend;
+  findConnectionPath(commonFriend: string): string[] {
     const connectionPath: string[] = [];
+    let targetId = commonFriend;
 
     while (targetId !== "") {
-      for (const level of this.friendLevelsA) {
-        const targetIndex = level.map(user => user.steamId).indexOf(targetId);
-        if (targetIndex > -1) {
-          connectionPath.unshift(level[targetIndex].steamId);
-          targetId = level[targetIndex].lowerLevelFriend;
-        }
-      }
+      connectionPath.unshift(targetId);
+      targetId = this.friendConnectionsA.get(targetId)!;
     }
 
-    connectionPath.pop(); // removing commonFriend to avoid duplicate values in the array
-
-    targetId = this.commonFriend;
+    targetId = commonFriend;
     while (targetId !== "") {
-      for (const level of this.friendLevelsB) {
-        const targetIndex = level.map(user => user.steamId).indexOf(targetId);
-        if (targetIndex > -1) {
-          connectionPath.push(level[targetIndex].steamId);
-          targetId = level[targetIndex].lowerLevelFriend;
-        }
+      targetId = this.friendConnectionsB.get(targetId)!;
+      if (targetId !== "") {
+        connectionPath.push(targetId);
       }
     }
 
@@ -137,37 +114,31 @@ class SeparationCalculator {
         tooManyRequests: this.tooManyRequests
       };
     }
+
     const startTime = new Date().getTime();
-    this.friendLevelsA[this.friendsLevel] = [{steamId: userA, lowerLevelFriend: ""}];
-    this.friendLevelsB[this.friendsLevel] = [{steamId: userB, lowerLevelFriend: ""}];
-    this.friendsLevel++;
+    this.currentFriendsLevelA = [userA];
+    this.currentFriendsLevelB = [userB];
+    this.friendConnectionsA.set(userA, "");
+    this.friendConnectionsB.set(userB, "");
 
-    while (!this.tooManyRequests) {
-      await this.fetchNextFriendLevel(this.friendLevelsA);
-      if ((this.friendLevelsA)[this.friendsLevel].length === 0) {
-        return generateSearchResult();
+    while (!this.tooManyRequests && (this.currentFriendsLevelA.length > 0 || this.currentFriendsLevelB.length > 0)) {
+      if (this.currentFriendsLevelA.length > 0) {
+        this.currentFriendsLevelA = await this.fetchNextFriendLevel(this.currentFriendsLevelA, this.friendConnectionsA);
+        const commonFriend = this.searchCurrentLevel(this.currentFriendsLevelA, this.friendConnectionsB);
+        if (commonFriend) {
+          this.path = this.findConnectionPath(commonFriend);
+          return generateSearchResult();
+        }
       }
 
-      let result = this.searchCurrentLevel(this.friendLevelsA, this.friendLevelsB);
-      if (result) {
-        this.commonFriend = result;
-        this.path = this.findConnectionPath();
-        return generateSearchResult();
+      if (this.currentFriendsLevelB.length > 0) {
+        this.currentFriendsLevelB = await this.fetchNextFriendLevel(this.currentFriendsLevelB, this.friendConnectionsB);
+        const commonFriend = this.searchCurrentLevel(this.currentFriendsLevelB, this.friendConnectionsA);
+        if (commonFriend) {
+          this.path = this.findConnectionPath(commonFriend);
+          return generateSearchResult();
+        }
       }
-
-      await this.fetchNextFriendLevel(this.friendLevelsB);
-      if ((this.friendLevelsB)[this.friendsLevel].length === 0) {
-        return generateSearchResult();
-      }
-
-      result = this.searchCurrentLevel(this.friendLevelsB, this.friendLevelsA);
-      if (result) {
-        this.commonFriend = result;
-        this.path = this.findConnectionPath();
-        return generateSearchResult();
-      }
-
-      this.friendsLevel++;
     }
 
     return generateSearchResult();
