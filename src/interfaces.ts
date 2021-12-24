@@ -7,11 +7,6 @@ export interface SearchResult {
   tooManyRequests: boolean;
 }
 
-export interface User {
-  steamId: string;
-  lowerLevelFriend: string;
-}
-
 export interface RawProfileData {
   personaname: string;
   realname?: string;

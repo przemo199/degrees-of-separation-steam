@@ -6,4 +6,5 @@
 /.idea/
 /.vscode/
 /*.iml
-/server-dist
+/server-dist/
+.http
