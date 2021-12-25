@@ -5,23 +5,31 @@
   export let steamApiKey: string;
   export let steamIds: string[];
 
-  let profilesData = [];
+  let request = new Promise(() => {});
 
-  onMount(async () => {
-    const response = await fetch("/api/profiles", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({apiKey: steamApiKey, steamIds: steamIds})
-    });
+  onMount(() => {
+    async function loadProfiles() {
+      const response = await fetch("/api/profiles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({apiKey: steamApiKey, steamIds: steamIds})
+      });
 
-    profilesData = await response.json();
+      return response.json();
+    }
+
+    request = loadProfiles();
   });
 </script>
 
 <div>
-  {#each profilesData as profileData}
-    <ProfileBar {profileData} />
-  {/each}
+  {#await request}
+    <p>Loading...</p>
+  {:then profilesData}
+    {#each profilesData as profileData}
+      <ProfileBar {profileData} />
+    {/each}
+  {/await}
 </div>
 
 <style>

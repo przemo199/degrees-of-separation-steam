@@ -60,7 +60,7 @@ class SeparationCalculator {
   async fetchNextFriendLevel(users: string[], userMap: Map<string, string>): Promise<string[]> {
     const promises = users.map(async user => {
       const friends = await this.fetchUserFriends(user);
-      const result: string[] = []
+      const result: string[] = [];
       friends.forEach(friend => {
         if (!userMap.has(friend)) {
           userMap.set(friend, user);
@@ -113,7 +113,7 @@ class SeparationCalculator {
         searchDuration: new Date().getTime() - startTime,
         tooManyRequests: this.tooManyRequests
       };
-    }
+    };
 
     const startTime = new Date().getTime();
     this.currentFriendsLevelA = [userA];

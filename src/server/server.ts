@@ -17,14 +17,41 @@ app.use(express.static("./public/build"));
 app.use(express.static("./public/"));
 
 app.post("/api/find-degree", async (req, res) => {
+  function isNumber(string: string): boolean {
+    const numOnlyRegex = /^\d+$/;
+    return numOnlyRegex.test(string)
+  }
+
+  async function resolveId(steamId: string): Promise<string> {
+    if (steamId.length !== steamIdLength || !isNumber(steamId)) {
+      const resolvedUrl = await resolveVanityUrl(body.apiKey, steamId);
+      if (resolvedUrl) {
+        return resolvedUrl;
+      } else {
+        res.status(400).send("Bad request");
+      }
+    }
+
+    return steamId;
+  }
+
   if (req.method !== "POST") res.status(405).send("Method Not allowed");
+
+  const apiKeyLength = 32;
+  const steamIdLength = 17;
   const body = req.body;
-  if (body.apiKey.length !== 32 && body.steamId1.length !== 17 && body.secondId.length !== 17) {
+  if (!body.hasOwnProperty("apiKey") ||
+    !body.hasOwnProperty("steamId1") ||
+    !body.hasOwnProperty("steamId2") ||
+    body.apiKey.length !== apiKeyLength) {
     res.status(400).send("Bad request");
   }
 
+  const steamId1 = resolveId(body.steamId1);
+  const steamId2 = resolveId(body.steamId2);
+
   const calculator = new SeparationCalculator(body.apiKey);
-  const searchResult = await calculator.findDegreeOfSeparation(body.steamId1, body.steamId2);
+  const searchResult = await calculator.findDegreeOfSeparation(await steamId1, await steamId2);
   res.status(200).json(searchResult);
 });
 
@@ -54,7 +81,7 @@ async function fetchProfilesData(steamApiKey: string, steamIds: string[]): Promi
   if (statusCode === 200) {
     const profilesData: RawProfileData[] = (await body.json()).response.players;
 
-    const profiles = profilesData.map(profile => {
+    const profiles: ProfileData[] = profilesData.map(profile => {
       return {
         profileName: profile.personaname,
         realName: profile.realname,
@@ -81,4 +108,21 @@ async function fetchProfilesData(steamApiKey: string, steamIds: string[]): Promi
   } else {
     return [];
   }
+}
+
+async function resolveVanityUrl(steamApiKey: string, vanityUrl: string): Promise<string | false> {
+  const resolveVanityUrlSteamApiEndpoint = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/";
+  const url = new URL(resolveVanityUrlSteamApiEndpoint);
+  url.searchParams.set("key", steamApiKey);
+  url.searchParams.set("vanityurl", vanityUrl);
+
+  const {statusCode, body} = await request(url);
+
+  if (statusCode === 200) {
+    const {response} = await body.json();
+    if (response.hasOwnProperty("steamid")) {
+      return response.steamid;
+    }
+  }
+  return false;
 }

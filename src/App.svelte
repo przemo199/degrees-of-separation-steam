@@ -32,7 +32,8 @@
     if (response.ok) {
       const searchResult: SearchResult = await response.json();
       data = {
-        degreeOfSeparation: searchResult.degreeOfSeparation === null ? "not found" : searchResult.degreeOfSeparation,
+        degreeOfSeparation:
+          searchResult.degreeOfSeparation === null ? "not found" : numberToNumeral(searchResult.degreeOfSeparation),
         path: searchResult.path === null ? "not found" : searchResult.path,
         requestsDone: searchResult.requestsDone,
         uniqueProfilesFetched: searchResult.uniqueProfilesFetched,
@@ -45,10 +46,23 @@
 
     searching = false;
   }
+
+  function numberToNumeral(number: number): string {
+    switch (number % 10) {
+      case 1:
+        return number + "st";
+      case 2:
+        return number + "nd";
+      case 3:
+        return number + "rd";
+      default:
+        return number + "th";
+    }
+  }
 </script>
 
 <main>
-  <NavBar/>
+  <NavBar />
 
   <div class="inline-label" style="text-align: right">
     <p class="label">Steam API key:</p>
@@ -58,20 +72,20 @@
 
   <div class="inline">
     <input type="text" bind:value={steamApiKey}>
-    <br/>
+    <br />
     <input type="text" bind:value={firstId}>
-    <br/>
+    <br />
     <input type="text" bind:value={secondId}>
   </div>
 
-  <br/>
+  <br />
 
   <button class="find-button" on:click={handleClickEvent}>
     Find degree of separation
   </button>
 
-  <br/>
-  <br/>
+  <br />
+  <br />
 
   {#if searching}
     <div class="background">
@@ -99,7 +113,7 @@
           Daily requests limit have been exhausted
         </p>
       {/if}
-      <PathShowcase steamApiKey={steamApiKey} steamIds={data.path}/>
+      <PathShowcase steamApiKey={steamApiKey} steamIds={data.path} />
     </div>
   {/if}
 
@@ -123,7 +137,7 @@
   }
 
   .background {
-    background-color: rgb(14,20,28);
+    background-color: rgb(14, 20, 28);
     display: inline-block;
     padding: 12px;
     text-align: left;
