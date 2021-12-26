@@ -7,17 +7,17 @@
 
   let request = Promise.resolve();
 
+  async function loadProfiles() {
+    const response = await fetch("/api/profiles", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({apiKey: steamApiKey, steamIds: steamIds})
+    });
+
+    return response.json();
+  }
+
   onMount(() => {
-    async function loadProfiles() {
-      const response = await fetch("/api/profiles", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({apiKey: steamApiKey, steamIds: steamIds})
-      });
-
-      return response.json();
-    }
-
     request = loadProfiles();
   });
 </script>
