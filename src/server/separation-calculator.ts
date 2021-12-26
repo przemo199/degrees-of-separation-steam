@@ -8,8 +8,6 @@ class SeparationCalculator {
   private uniqueProfilesFetched: number;
   private tooManyRequests: boolean;
   private path: string[];
-  currentFriendsLevelA: string[];
-  currentFriendsLevelB: string[];
   friendConnectionsA: Map<string, string>;
   friendConnectionsB: Map<string, string>;
 
@@ -20,8 +18,6 @@ class SeparationCalculator {
     this.uniqueProfilesFetched = 0;
     this.tooManyRequests = false;
     this.path = [];
-    this.currentFriendsLevelA = [];
-    this.currentFriendsLevelB = [];
     this.friendConnectionsA = new Map<string, string>();
     this.friendConnectionsB = new Map<string, string>();
   }
@@ -106,34 +102,34 @@ class SeparationCalculator {
   async findDegreeOfSeparation(userA: string, userB: string): Promise<SearchResult> {
     const generateSearchResult = () => {
       return {
+        searchDuration: new Date().getTime() - startTime,
         degreeOfSeparation: this.path.length > 0 ? this.path.length - 1 : null,
         path: this.path.length > 0 ? this.path : null,
         requestsDone: this.requestsDone,
         uniqueProfilesFetched: this.uniqueProfilesFetched,
-        searchDuration: new Date().getTime() - startTime,
         tooManyRequests: this.tooManyRequests
       };
     };
 
     const startTime = new Date().getTime();
-    this.currentFriendsLevelA = [userA];
-    this.currentFriendsLevelB = [userB];
+    let currentFriendsLevelA = [userA];
+    let currentFriendsLevelB = [userB];
     this.friendConnectionsA.set(userA, "");
     this.friendConnectionsB.set(userB, "");
 
-    while (!this.tooManyRequests && (this.currentFriendsLevelA.length > 0 || this.currentFriendsLevelB.length > 0)) {
-      if (this.currentFriendsLevelA.length > 0) {
-        this.currentFriendsLevelA = await this.fetchNextFriendLevel(this.currentFriendsLevelA, this.friendConnectionsA);
-        const commonFriend = this.searchCurrentLevel(this.currentFriendsLevelA, this.friendConnectionsB);
+    while (!this.tooManyRequests && (currentFriendsLevelA.length > 0 || currentFriendsLevelB.length > 0)) {
+      if (currentFriendsLevelA.length > 0) {
+        currentFriendsLevelA = await this.fetchNextFriendLevel(currentFriendsLevelA, this.friendConnectionsA);
+        const commonFriend = this.searchCurrentLevel(currentFriendsLevelA, this.friendConnectionsB);
         if (commonFriend) {
           this.path = this.findConnectionPath(commonFriend);
           return generateSearchResult();
         }
       }
 
-      if (this.currentFriendsLevelB.length > 0) {
-        this.currentFriendsLevelB = await this.fetchNextFriendLevel(this.currentFriendsLevelB, this.friendConnectionsB);
-        const commonFriend = this.searchCurrentLevel(this.currentFriendsLevelB, this.friendConnectionsA);
+      if (currentFriendsLevelB.length > 0) {
+        currentFriendsLevelB = await this.fetchNextFriendLevel(currentFriendsLevelB, this.friendConnectionsB);
+        const commonFriend = this.searchCurrentLevel(currentFriendsLevelB, this.friendConnectionsA);
         if (commonFriend) {
           this.path = this.findConnectionPath(commonFriend);
           return generateSearchResult();

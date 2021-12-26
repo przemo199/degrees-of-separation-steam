@@ -1,7 +1,7 @@
 <script lang="ts">
   import NavBar from "./components/NavBar.svelte";
-  import {SearchResult} from './interfaces';
-  import PathShowcase from './components/PathShowcase.svelte';
+  import type {SearchResult} from "./interfaces";
+  import PathShowcase from "./components/PathShowcase.svelte";
 
   let steamApiKey: string;
   let firstId: string;
@@ -9,14 +9,19 @@
   let searching: boolean = false;
   let data = null;
 
-  async function handleClickEvent() {
+  async function findDegreeOfSeparation() {
     if (!steamApiKey || !firstId || !secondId) {
-      alert("You need to provide all the values");
+      alert("All values must be provided");
       return;
     }
 
-    if (steamApiKey.length !== 32 && firstId.length !== 17 && secondId.length !== 17) {
-      alert("Provided values are incorrect");
+    if (steamApiKey.length !== 32) {
+      alert("Incorrect Steam API key provided");
+      return;
+    }
+
+    if (firstId === secondId) {
+      alert("Two different Steam IDs must be provided");
       return;
     }
 
@@ -64,23 +69,24 @@
 <main>
   <NavBar />
 
-  <div class="inline-label" style="text-align: right">
-    <p class="label">Steam API key:</p>
-    <p class="label">Steam ID of the first profile:</p>
-    <p class="label">Steam ID of the second profile:</p>
-  </div>
-
-  <div class="inline">
-    <input type="text" bind:value={steamApiKey}>
-    <br />
-    <input type="text" bind:value={firstId}>
-    <br />
-    <input type="text" bind:value={secondId}>
+  <div class="form-container">
+    <div class="input-row">
+      <p>Steam API key:</p>
+      <input type="text" bind:value={steamApiKey}>
+    </div>
+    <div class="input-row">
+      <p>Steam ID of the first profile:</p>
+      <input type="text" bind:value={firstId}>
+    </div>
+    <div class="input-row">
+      <p>Steam ID of the second profile:</p>
+      <input type="text" bind:value={secondId}>
+    </div>
   </div>
 
   <br />
 
-  <button class="find-button" on:click={handleClickEvent}>
+  <button class="find-button" on:click={findDegreeOfSeparation}>
     Find degree of separation
   </button>
 
@@ -121,19 +127,11 @@
 
 <style>
   main {
+    display: flex;
+    flex-direction: column;
     text-align: center;
-    min-width: 600px;
-    overflow-x: hidden;
+    min-width: 640px;
     color: rgb(184, 182, 180);
-  }
-
-  .inline {
-    display: inline-block;
-    text-align: right;
-  }
-
-  .inline-label {
-    display: inline-block;
   }
 
   .background {
@@ -142,20 +140,32 @@
     padding: 12px;
     text-align: left;
     margin: 10px;
+    align-self: center;
   }
 
-  p.message {
+  .message {
     margin: 5px;
   }
 
-  .label {
-    margin-bottom: 23px;
-    margin-right: 10px;
+  .input-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8em;
+  }
+
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: end;
+    gap: 0.6em;
   }
 
   input {
     color: rgb(233, 233, 233);
-    width: 19em;
+    width: 20em;
     background-color: rgb(50, 53, 60);
     border-radius: 3px;
     border: none;
@@ -173,6 +183,7 @@
     padding-left: 1em;
     padding-right: 1em;
     cursor: pointer;
+    align-self: center;
   }
 
   h1 {

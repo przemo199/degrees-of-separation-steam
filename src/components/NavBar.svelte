@@ -11,8 +11,8 @@
 
 <style>
   nav {
-    width: 100%;
-    text-align: left;
+    display: flex;
+    justify-content: space-between;
     vertical-align: middle;
     color: rgb(198, 212, 223);
     background-color: rgb(23, 26, 33);
@@ -23,12 +23,10 @@
   }
 
   p {
-    margin: auto;
-    display: inline-block;
+    justify-self: left;
   }
 
   .clock {
-    float: right;
-    margin: auto 3% auto auto;
+    justify-self: right;
   }
 </style>

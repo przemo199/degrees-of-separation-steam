@@ -5,7 +5,7 @@
   export let steamApiKey: string;
   export let steamIds: string[];
 
-  let request = new Promise(() => {});
+  let request = Promise.resolve();
 
   onMount(() => {
     async function loadProfiles() {
@@ -22,7 +22,7 @@
   });
 </script>
 
-<div>
+<div class="container">
   {#await request}
     <p>Loading...</p>
   {:then profilesData}
@@ -33,7 +33,7 @@
 </div>
 
 <style>
-  div {
+  .container {
     display: flex;
     flex-direction: column;
   }

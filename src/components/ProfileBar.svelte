@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {ProfileData} from "../interfaces";
+  import type {ProfileData} from "../interfaces";
 
   export let profileData: ProfileData;
 
