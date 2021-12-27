@@ -1,26 +1,29 @@
 <script lang="ts">
   import type {SearchResult} from "../interfaces";
-  import PathShowcase from "./PathShowcase.svelte";
+  import SearchResultDisplay from "./SearchResultDisplay.svelte";
 
-  let steamApiKey: string;
+  const STEAM_API_KEY_LENGTH = 32;
+
+  let apiKey: string;
   let firstId: string;
   let secondId: string;
   let searching: boolean = false;
   let data = null;
+  let request: Promise<SearchResult> = Promise.reject();
 
-  async function handleSearch() {
-    if (!steamApiKey || !firstId || !secondId) {
-      alert("All values must be provided");
+  async function findDegreeOfSeparation() {
+    if (!apiKey || !firstId || !secondId) {
+      alert("You must provide all the values");
       return;
     }
 
-    if (steamApiKey.length !== 32) {
-      alert("Incorrect Steam API key provided");
+    if (apiKey.length !== STEAM_API_KEY_LENGTH) {
+      alert("You provided incorrect Steam API key");
       return;
     }
 
     if (firstId === secondId) {
-      alert("Two different Steam IDs must be provided");
+      alert("You must provide two different Steam IDs");
       return;
     }
 
@@ -30,20 +33,11 @@
     const response = await fetch("/api/find-degree", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({apiKey: steamApiKey, steamId1: firstId, steamId2: secondId})
+      body: JSON.stringify({apiKey: apiKey, steamId1: firstId, steamId2: secondId})
     });
 
     if (response.ok) {
-      const searchResult: SearchResult = await response.json();
-      data = {
-        degreeOfSeparation:
-          searchResult.degreeOfSeparation === null ? "not found" : numberToNumeral(searchResult.degreeOfSeparation),
-        path: searchResult.path === null ? "not found" : searchResult.path,
-        requestsDone: searchResult.requestsDone,
-        uniqueProfilesFetched: searchResult.uniqueProfilesFetched,
-        searchDuration: (searchResult.searchDuration / 1000) + "s",
-        tooManyRequests: searchResult.tooManyRequests
-      }
+      return (await response.json()) as SearchResult;
     } else {
       alert(response.status + " " + response.statusText);
     }
@@ -51,73 +45,40 @@
     searching = false;
   }
 
-  function numberToNumeral(number: number): string {
-    switch (number % 10) {
-      case 1:
-        return number + "st";
-      case 2:
-        return number + "nd";
-      case 3:
-        return number + "rd";
-      default:
-        return number + "th";
-    }
+  function handleSearch() {
+    request = findDegreeOfSeparation();
   }
 </script>
 
 <div class="form-container">
   <div class="input-row">
-    <p>Steam API key:</p>
-    <input type="text" bind:value={steamApiKey}>
+    <label for="api-key">Steam API key:</label>
+    <input type="text" id="api-key" bind:value={apiKey}>
   </div>
   <div class="input-row">
-    <p>Steam ID of the first profile:</p>
-    <input type="text" bind:value={firstId}>
+    <label for="first-id">Steam ID of the first profile:</label>
+    <input type="text" id="first-id" bind:value={firstId}>
   </div>
   <div class="input-row">
-    <p>Steam ID of the second profile:</p>
-    <input type="text" bind:value={secondId}>
+    <label for="second-id">Steam ID of the second profile:</label>
+    <input type="text" id="second-id" bind:value={secondId}>
   </div>
 </div>
-
-<br />
 
 <button class="find-button" on:click={handleSearch}>
   Find degree of separation
 </button>
 
-<br />
-<br />
-
-{#if searching}
+{#await request}
   <div class="background">
     <h1>Searching...</h1>
   </div>
-{:else if data !== null}
+{:then result}
   <div class="background">
-    <p class="message">
-      {"Degree of separation: " + data.degreeOfSeparation}
-    </p>
-    <p class="message">
-      {"Connection path discovered: " + data.path.join(", ")}
-    </p>
-    <p class="message">
-      {"Requests done: " + data.requestsDone}
-    </p>
-    <p class="message">
-      {"Unique profiles fetched: " + data.uniqueProfilesFetched}
-    </p>
-    <p class="message">
-      {"Search duration: " + data.searchDuration}
-    </p>
-    {#if data.tooManyRequests === true}
-      <p class="message">
-        Daily requests limit have been exhausted
-      </p>
-    {/if}
-    <PathShowcase steamApiKey={steamApiKey} steamIds={data.path} />
+    <SearchResultDisplay {apiKey} data={result} />
   </div>
-{/if}
+{:catch error}
+{/await}
 
 <style>
   .background {
@@ -127,10 +88,6 @@
     text-align: left;
     margin: 10px;
     align-self: center;
-  }
-
-  .message {
-    margin: 5px;
   }
 
   .input-row {
@@ -147,6 +104,7 @@
     align-self: center;
     align-items: end;
     gap: 0.6em;
+    margin-bottom: 1.5em;
   }
 
   input {
@@ -170,6 +128,7 @@
     padding-right: 1em;
     cursor: pointer;
     align-self: center;
+    margin-bottom: 2.5em;
   }
 
   h1 {

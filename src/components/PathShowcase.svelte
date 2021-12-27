@@ -2,16 +2,16 @@
   import {onMount} from "svelte";
   import ProfileBar from "./ProfileBar.svelte";
 
-  export let steamApiKey: string;
+  export let apiKey: string;
   export let steamIds: string[];
 
-  let request = Promise.resolve();
+  let request: Promise<any> = Promise.reject();
 
   async function loadProfiles() {
     const response = await fetch("/api/profiles", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({apiKey: steamApiKey, steamIds: steamIds})
+      body: JSON.stringify({apiKey: apiKey, steamIds: steamIds})
     });
 
     return response.json();
@@ -29,6 +29,7 @@
     {#each profilesData as profileData}
       <ProfileBar {profileData} />
     {/each}
+  {:catch error}
   {/await}
 </div>
 
