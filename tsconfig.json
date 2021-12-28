@@ -2,7 +2,7 @@
   "extends": "@tsconfig/svelte/tsconfig.json",
 
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2021",
     "module": "es2020",
     "sourceMap": true
   },

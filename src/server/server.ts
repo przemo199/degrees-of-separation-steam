@@ -35,7 +35,7 @@ app.post("/api/find-degree", async (req, res) => {
   const steamId1 = await id1Promise;
   const steamId2 = await id2Promise;
 
-  if (steamId1 == steamId2) {
+  if (steamId1 === steamId2) {
     res.status(400).send("Bad request");
   }
 
@@ -126,7 +126,7 @@ function isNumber(string: string): boolean {
 }
 
 function isVanityUrl(steamId: string): boolean {
-  return steamId.length !== STEAM_ID_LENGTH || !isNumber(steamId);
+  return !(steamId.length === STEAM_ID_LENGTH && isNumber(steamId));
 }
 
 async function isValidId(steamId: string, apiKey: string): Promise<boolean> {
