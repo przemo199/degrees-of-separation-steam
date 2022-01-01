@@ -7,6 +7,5 @@
     "sourceMap": true
   },
 
-  "include": ["src"],
-  "exclude": ["public/*"]
+  "include": ["src"]
 }
