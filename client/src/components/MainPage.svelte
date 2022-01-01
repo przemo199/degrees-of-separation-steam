@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type {SearchResult} from "../interfaces";
+  import type {SearchResult} from "shared";
   import SearchResultDisplay from "./SearchResultDisplay.svelte";
   import SearchDetailsForm from "./SearchDetailsForm.svelte";
 

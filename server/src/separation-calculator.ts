@@ -1,5 +1,5 @@
 import {request} from "undici";
-import {SearchResult} from "../interfaces";
+import {SearchResult} from "shared";
 
 class SeparationCalculator {
   private readonly apiKey: string;

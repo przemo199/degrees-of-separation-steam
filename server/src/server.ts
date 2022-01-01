@@ -1,8 +1,8 @@
-import express, {NextFunction, Request, Response} from "express";
+import express, {Request, Response, NextFunction} from "express";
 import http from "http";
 import {request} from "undici";
 import {SeparationCalculator} from "./separation-calculator.js";
-import {ProfileData, RawProfileData} from "../interfaces";
+import {ProfileData, RawProfileData} from "shared";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,8 +20,8 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
-app.use(express.static("./public/build"));
-app.use(express.static("./public/"));
+app.use(express.static("../client/public/build"));
+app.use(express.static("../client/public/"));
 
 app.post("/api/find-degree", async (req, res, next) => {
   const body = req.body;

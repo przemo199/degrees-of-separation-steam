@@ -1,6 +1,6 @@
 <script lang="ts">
   import PathShowcase from "./PathShowcase.svelte";
-  import type {SearchResult} from "../interfaces";
+  import type {SearchResult} from "shared";
 
   export let data: SearchResult;
   export let apiKey;

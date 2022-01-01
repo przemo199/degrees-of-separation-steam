@@ -1,10 +1,15 @@
-/node_modules/
-/public/build/
+node_modules/
+*/public/build/
 
 .DS_Store
 
-/.idea/
-/.vscode/
-/*.iml
-/server-dist/
+.pnp.*
+.yarn/*
+!.yarn/plugins/
+!.yarn/releases/
+
+.idea/
+.vscode/
+*.iml
+*/dist/
 .http
