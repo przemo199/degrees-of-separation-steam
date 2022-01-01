@@ -20,8 +20,7 @@
     if (response.ok) {
       return (await response.json()) as SearchResult;
     } else {
-      alert(response.status + " " + response.statusText);
-      return Promise.reject()
+      return Promise.reject(new Error(response.statusText));
     }
   }
 
@@ -51,25 +50,31 @@
   Find degree of separation
 </button>
 
-{#await request}
-  <div class="background">
+<div class="result-container">
+  {#await request}
     <h1>Searching...</h1>
-  </div>
-{:then result}
-  <div class="background">
+  {:then result}
     <SearchResultDisplay {apiKey} data={result} />
-  </div>
-{:catch error}
-{/await}
+  {:catch error}
+    {#if error}
+      {`Oops, something went wrong: ${error.message}`}
+    {/if}
+  {/await}
+</div>
 
 <style>
-  .background {
+  .result-container {
     background-color: rgb(14, 20, 28);
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
     padding: 12px;
     text-align: left;
     margin: 10px;
     align-self: center;
+  }
+
+  .result-container:empty {
+    display: none;
   }
 
   .find-button {

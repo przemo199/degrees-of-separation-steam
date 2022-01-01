@@ -5,7 +5,7 @@
   export let data: SearchResult;
   export let apiKey;
 
-  $: processedData = {
+  $: toDisplay = typeof data !== "undefined" ? {
     degreeOfSeparation:
       data.degreeOfSeparation === null ? "not found" : numberToNumeral(data.degreeOfSeparation),
     path: data.path === null ? "not found" : data.path.join(", "),
@@ -13,7 +13,7 @@
     uniqueProfilesFetched: data.uniqueProfilesFetched,
     searchDuration: (data.searchDuration / 1000) + "s",
     tooManyRequests: data.tooManyRequests
-  };
+  } : {};
 
   function numberToNumeral(number: number): string {
     switch (number % 10) {
@@ -30,27 +30,27 @@
 </script>
 
 <p class="message">
-  {"Degree of separation: " + processedData.degreeOfSeparation}
+  {"Degree of separation: " + toDisplay.degreeOfSeparation}
 </p>
 <p class="message">
-  {"Connection path discovered: " + processedData.path}
+  {"Connection path discovered: " + toDisplay.path}
 </p>
 <p class="message">
-  {"Requests done: " + processedData.requestsDone}
+  {"Requests done: " + toDisplay.requestsDone}
 </p>
 <p class="message">
-  {"Unique profiles fetched: " + processedData.uniqueProfilesFetched}
+  {"Unique profiles fetched: " + toDisplay.uniqueProfilesFetched}
 </p>
 <p class="message">
-  {"Search duration: " + processedData.searchDuration}
+  {"Search duration: " + toDisplay.searchDuration}
 </p>
-{#if processedData.tooManyRequests === true}
+{#if toDisplay.tooManyRequests === true}
   <p class="message">
     Daily requests limit have been exhausted
   </p>
 {/if}
-{#if Array.isArray(processedData.path)}
-  <PathShowcase {apiKey} steamIds={processedData.path} />
+{#if Array.isArray(data.path)}
+  <PathShowcase {apiKey} steamIds={data.path} />
 {/if}
 
 <style>

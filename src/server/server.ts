@@ -1,4 +1,4 @@
-import express from "express";
+import express, {NextFunction, Request, Response} from "express";
 import http from "http";
 import {request} from "undici";
 import {SeparationCalculator} from "./separation-calculator.js";
@@ -10,6 +10,10 @@ const PORT = process.env.PORT || 3000;
 const API_KEY_LENGTH = 32;
 const STEAM_ID_LENGTH = 17;
 
+const BAD_REQUEST = {message: "Bad request", code: 400};
+const METHOD_NOT_ALLOWED = {message: "Method not allowed", code: 405};
+const INTERNAL_SERVER_ERROR = {message: "Internal server error", code: 500};
+
 app.use(express.urlencoded({
   extended: true
 }));
@@ -19,15 +23,13 @@ app.use(express.json());
 app.use(express.static("./public/build"));
 app.use(express.static("./public/"));
 
-app.post("/api/find-degree", async (req, res) => {
-  if (req.method !== "POST") res.status(405).send("Method Not allowed");
-
+app.post("/api/find-degree", async (req, res, next) => {
   const body = req.body;
   if (!body.hasOwnProperty("apiKey") ||
     !body.hasOwnProperty("steamId1") ||
     !body.hasOwnProperty("steamId2") ||
     body.apiKey.length !== API_KEY_LENGTH) {
-    res.status(400).send("Bad request");
+    return next(new Error(BAD_REQUEST.message));
   }
 
   const id1Promise = validateId(body.steamId1, body.apiKey);
@@ -35,33 +37,56 @@ app.post("/api/find-degree", async (req, res) => {
   const steamId1 = await id1Promise;
   const steamId2 = await id2Promise;
 
-  if (steamId1 === steamId2) {
-    res.status(400).send("Bad request");
-  }
+  if (steamId1 === steamId2) return next(new Error(BAD_REQUEST.message));
 
   if (steamId1 && steamId2) {
     const calculator = new SeparationCalculator(body.apiKey);
     const searchResult = await calculator.findDegreeOfSeparation(steamId1, steamId2);
-    res.status(200).json(searchResult);
+    return res.status(200).json(searchResult);
   } else {
-    res.status(400).send("Bad request");
+    return next(new Error(BAD_REQUEST.message));
   }
 });
 
-app.post("/api/profiles", async (req, res) => {
-  if (req.method !== "POST") res.status(405).send("Method Not allowed");
+app.get("/api/find-degree", (req, res, next) => {
+  return next(new Error(METHOD_NOT_ALLOWED.message));
+});
+
+app.post("/api/profiles", async (req, res, next) => {
+  if (req.method !== "POST") return next(new Error(METHOD_NOT_ALLOWED.message));
   const body = req.body;
-  if (body.apiKey.length !== 32) res.status(400).send("Bad request");
+  if (body.apiKey.length !== 32) return next(new Error(BAD_REQUEST.message));
 
   const profiles = await fetchProfilesData(body.apiKey, body.steamIds);
-  res.status(200).json(profiles);
+  return res.status(200).json(profiles);
 });
+
+app.get("/api/profiles", (req, res, next) => {
+  return next(new Error(METHOD_NOT_ALLOWED.message));
+});
+
+app.use(errorHandler);
 
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
 });
+
+function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+  if (err instanceof Error) {
+    switch (err.message) {
+      case BAD_REQUEST.message:
+        res.status(BAD_REQUEST.code).send(BAD_REQUEST.message);
+        break;
+      case METHOD_NOT_ALLOWED.message:
+        res.status(METHOD_NOT_ALLOWED.code).send(METHOD_NOT_ALLOWED.message);
+        break;
+    }
+  } else {
+    res.status(INTERNAL_SERVER_ERROR.code).send(INTERNAL_SERVER_ERROR.message);
+  }
+}
 
 async function fetchProfilesData(steamApiKey: string, steamIds: string[]): Promise<ProfileData[]> {
   const profileSummarySteamApiEndpoint = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";

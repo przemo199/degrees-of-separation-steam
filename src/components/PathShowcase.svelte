@@ -30,6 +30,9 @@
       <ProfileBar {profileData} />
     {/each}
   {:catch error}
+    {#if error}
+      {`Oops, something went wrong: ${error.message}`}
+    {/if}
   {/await}
 </div>
 
