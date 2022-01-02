@@ -1,0 +1,14 @@
+*/public/build/
+
+.DS_Store
+
+.pnp.*
+.yarn/*
+!.yarn/plugins/
+!.yarn/releases/
+
+.idea/
+.vscode/
+*.iml
+*/dist/
+.http

@@ -5,7 +5,7 @@
   export let data: SearchResult;
   export let apiKey;
 
-  $: toDisplay = typeof data !== "undefined" ? {
+  $: toDisplay = {
     degreeOfSeparation:
       data.degreeOfSeparation === null ? "not found" : numberToNumeral(data.degreeOfSeparation),
     path: data.path === null ? "not found" : data.path.join(", "),
@@ -13,7 +13,7 @@
     uniqueProfilesFetched: data.uniqueProfilesFetched,
     searchDuration: (data.searchDuration / 1000) + "s",
     tooManyRequests: data.tooManyRequests
-  } : {};
+  };
 
   function numberToNumeral(number: number): string {
     switch (number % 10) {
