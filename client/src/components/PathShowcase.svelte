@@ -5,7 +5,7 @@
   export let apiKey: string;
   export let steamIds: string[];
 
-  let request: Promise<any> = Promise.reject();
+  let request: Promise<Record<string, unknown>> = Promise.reject();
 
   async function loadProfiles() {
     const response = await fetch("/api/profiles", {

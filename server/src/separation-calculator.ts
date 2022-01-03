@@ -38,7 +38,7 @@ class SeparationCalculator {
 
     switch (statusCode) {
       case 200:
-        return (await body.json()).friendslist.friends.map((friend: any) => friend.steamid);
+        return (await body.json()).friendslist.friends.map((friend: { steamid: string }) => friend.steamid);
       case 401:
         this.privateProfileResponses++;
         break;
@@ -73,7 +73,7 @@ class SeparationCalculator {
   searchCurrentLevel(currentLevel: string[], mapToSearch: Map<string, string>): string | false {
     for (const friend of currentLevel) {
       if (mapToSearch.has(friend)) {
-        return friend
+        return friend;
       }
     }
     return false;
@@ -83,17 +83,15 @@ class SeparationCalculator {
     const connectionPath: string[] = [];
     let targetId = commonFriend;
 
-    while (targetId !== "") {
+    while (targetId) {
       connectionPath.unshift(targetId);
-      targetId = this.friendConnectionsA.get(targetId)!;
+      targetId = this.friendConnectionsA.get(targetId) || "";
     }
 
-    targetId = commonFriend;
-    while (targetId !== "") {
-      targetId = this.friendConnectionsB.get(targetId)!;
-      if (targetId !== "") {
-        connectionPath.push(targetId);
-      }
+    targetId = this.friendConnectionsB.get(commonFriend) || "";
+    while (targetId) {
+      connectionPath.push(targetId);
+      targetId = this.friendConnectionsB.get(targetId) || "";
     }
 
     return connectionPath;
