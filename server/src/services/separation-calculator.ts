@@ -139,4 +139,4 @@ class SeparationCalculator {
   }
 }
 
-export {SeparationCalculator};
+export default SeparationCalculator;

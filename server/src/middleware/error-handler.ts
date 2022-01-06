@@ -1,7 +1,7 @@
 import {ReasonPhrases, StatusCodes} from "http-status-codes";
 import {NextFunction, Request, Response} from "express";
 
-function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
+function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   if (err instanceof Error) {
     switch (err.message) {
       case ReasonPhrases.BAD_REQUEST:

@@ -1,7 +1,7 @@
 import express from "express";
 import http from "http";
 import routes from "./routes/index.js";
-import {errorHandler} from "./error-controller.js";
+import {errorHandler} from "./middleware/error-handler.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,4 +21,3 @@ const server = http.createServer(app);
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
 });
-
