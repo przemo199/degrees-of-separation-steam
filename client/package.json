@@ -5,12 +5,18 @@
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.1.1",
     "@rollup/plugin-typescript": "^8.0.0",
+    "@testing-library/dom": "^8.11.1",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/svelte": "^3.0.3",
+    "@testing-library/user-event": "^13.5.0",
     "@tsconfig/svelte": "^3.0.0",
     "@types/eslint": "^8",
+    "@types/testing-library__jest-dom": "^5.14.2",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
     "eslint": "^8.6.0",
     "eslint-plugin-svelte3": "^3.2.1",
+    "jest": "^27.4.7",
     "rollup": "^2.62.0",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
@@ -20,9 +26,11 @@
     "sirv-cli": "^1.0.0",
     "svelte": "^3.0.0",
     "svelte-check": "^2.0.0",
-    "svelte-preprocess": "^4.0.0",
+    "svelte-jester": "^2.1.5",
+    "svelte-preprocess": "^4.10.1",
+    "ts-jest": "^27.1.2",
     "tslib": "^2.0.0",
-    "typescript": "^4.0.0"
+    "typescript": "^4.5.4"
   },
   "packageManager": "yarn@3.1.1",
   "scripts": {
@@ -30,7 +38,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev": "rollup -c -w",
     "lint": "eslint ./src/**/*.{ts,svelte}",
-    "start": "sirv public --no-clear"
+    "start": "sirv public --no-clear",
+    "test": "jest"
   },
   "type": "module"
 }

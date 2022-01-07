@@ -1,7 +1,7 @@
 <script lang="ts">
-  export let apiKey: string;
-  export let firstId: string;
-  export let secondId: string;
+  export let apiKey = "";
+  export let firstId = "";
+  export let secondId = "";
 </script>
 
 <div class="form-container">
