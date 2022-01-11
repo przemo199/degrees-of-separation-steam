@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PathShowcase from "./PathShowcase.svelte";
+  import ConnectionPathView from "./ConnectionPathView.svelte";
   import type {SearchResult} from "shared";
 
   export let data: SearchResult;
@@ -50,7 +50,7 @@
   </p>
 {/if}
 {#if Array.isArray(data.path)}
-  <PathShowcase {apiKey} steamIds={data.path} />
+  <ConnectionPathView {apiKey} steamIds={data.path} />
 {/if}
 
 <style>

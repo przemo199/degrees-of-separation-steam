@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from "svelte";
-  import ProfileBar from "./ProfileBar.svelte";
+  import ProfileCard from "./ProfileCard.svelte";
 
   export let apiKey: string;
   export let steamIds: string[];
@@ -27,7 +27,7 @@
     <p>Loading...</p>
   {:then profilesData}
     {#each profilesData as profileData}
-      <ProfileBar {profileData} />
+      <ProfileCard {profileData} />
     {/each}
   {:catch error}
     {#if error}

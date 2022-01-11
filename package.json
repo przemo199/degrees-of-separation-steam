@@ -15,7 +15,8 @@
   "scripts": {
     "build": "yarn workspaces foreach -v --topological-dev run build",
     "start": "yarn workspace server start",
-    "lint": "yarn workspaces foreach -v run lint"
+    "lint": "yarn workspaces foreach -v run lint",
+    "test": "yarn workspaces foreach -v run test"
   },
   "workspaces": [
     "client",

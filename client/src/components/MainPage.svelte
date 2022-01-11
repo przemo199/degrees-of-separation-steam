@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {SearchResult} from "shared";
-  import SearchResultDisplay from "./SearchResultDisplay.svelte";
+  import SearchResultView from "./SearchResultView.svelte";
   import SearchDetailsForm from "./SearchDetailsForm.svelte";
 
   const STEAM_API_KEY_LENGTH = 32;
@@ -54,7 +54,7 @@
   {#await request}
     <h1>Searching...</h1>
   {:then result}
-    <SearchResultDisplay {apiKey} data={result} />
+    <SearchResultView {apiKey} data={result} />
   {:catch error}
     {#if error}
       {`Oops, something went wrong: ${error.message}`}

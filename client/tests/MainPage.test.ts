@@ -13,7 +13,7 @@ describe("MainPage", () => {
     expect(container.innerHTML).toContain("find-button");
   });
 
-  test("button handles click when form is empty", () => {
+  test("search button handles click when the form is not filled correctly", () => {
     const {getByText} = render(MainPage);
     window.alert = jest.fn().mockImplementation(() => {});
     window.fetch = jest.fn().mockImplementation(() => {});
@@ -25,8 +25,8 @@ describe("MainPage", () => {
     delete window.fetch;
   });
 
-  test("button handles click correctly when form is filled", async () => {
-    const {getByText, getByLabelText, getByDisplayValue} = render(MainPage);
+  test("search button handles click correctly when form is filled", async () => {
+    const {getByText, getByLabelText} = render(MainPage);
     const apiKeyInput = getByLabelText("Steam API key:");
     const steamId1Input = getByLabelText("Steam ID of the first profile:");
     const steamId2Input = getByLabelText("Steam ID of the second profile:");
