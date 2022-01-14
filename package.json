@@ -2,9 +2,6 @@
   "name": "degrees-of-separation-steam",
   "version": "1.0.0",
   "author": "Przemek Kaminski <przemyslaw.m.kaminski@gmail.com> (https://www.linkedin.com/in/przemekkaminski/)",
-  "license": "ISC",
-  "packageManager": "yarn@3.1.1",
-  "private": true,
   "devDependencies": {
     "@types/eslint": "^8",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
@@ -12,10 +9,13 @@
     "eslint": "^8.6.0",
     "typescript": "^4.0.0"
   },
+  "license": "ISC",
+  "packageManager": "yarn@3.1.1",
+  "private": true,
   "scripts": {
     "build": "yarn workspaces foreach -v --topological-dev run build",
-    "start": "yarn workspace server start",
     "lint": "yarn workspaces foreach -v run lint",
+    "start": "yarn workspace server start",
     "test": "yarn workspaces foreach -v run test"
   },
   "workspaces": [
