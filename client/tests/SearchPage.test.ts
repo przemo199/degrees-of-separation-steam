@@ -1,20 +1,20 @@
 import {render} from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
-import MainPage from "../src/components/MainPage.svelte";
+import SearchPage from "../src/components/SearchPage.svelte";
 
 describe("MainPage", () => {
   test("has search form", () => {
-    const {container} = render(MainPage);
+    const {container} = render(SearchPage);
     expect(container.innerHTML).toContain("form-container");
   });
 
   test("has search button", () => {
-    const {container} = render(MainPage);
+    const {container} = render(SearchPage);
     expect(container.innerHTML).toContain("find-button");
   });
 
   test("search button handles click when the form is not filled correctly", () => {
-    const {getByText} = render(MainPage);
+    const {getByText} = render(SearchPage);
     window.alert = jest.fn().mockImplementation(() => {});
     window.fetch = jest.fn().mockImplementation(() => {});
     const searchButton = getByText("Find degree of separation");
@@ -26,7 +26,7 @@ describe("MainPage", () => {
   });
 
   test("search button handles click correctly when form is filled", async () => {
-    const {getByText, getByLabelText} = render(MainPage);
+    const {getByText, getByLabelText} = render(SearchPage);
     const apiKeyInput = getByLabelText("Steam API key:");
     const steamId1Input = getByLabelText("Steam ID of the first profile:");
     const steamId2Input = getByLabelText("Steam ID of the second profile:");

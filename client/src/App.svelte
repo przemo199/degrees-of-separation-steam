@@ -1,6 +1,6 @@
 <script lang="ts">
   import NavBar from "./components/NavBar.svelte";
-  import MainPage from "./components/MainPage.svelte";
+  import MainPage from "./components/SearchPage.svelte";
 </script>
 
 <main>

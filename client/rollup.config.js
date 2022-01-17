@@ -14,12 +14,16 @@ function serve() {
   let server;
 
   function toExit() {
-    if (server) server.kill(0);
+    if (server) {
+      server.kill(0);
+    }
   }
 
   return {
     writeBundle() {
-      if (server) return;
+      if (server) {
+        return;
+      }
       server = spawn("npm", ["run", "start", "--", "--dev"], {
         stdio: ["ignore", "inherit", "inherit"],
         shell: true
@@ -47,9 +51,11 @@ export default {
         dev: !production
       }
     }),
+
     // we'll extract any component CSS out into
     // a separate file - better for performance
     css({output: "bundle.css"}),
+
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In
     // some cases you'll need additional configuration -
