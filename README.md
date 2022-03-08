@@ -11,19 +11,19 @@ Degrees of Separation Between Steam Users is a website built using Svelte with N
 Copy the following repository using:
 
 ```bash 
-    git clone https://github.com/przemo199/degrees-of-separation-steam.git
+git clone https://github.com/przemo199/degrees-of-separation-steam.git
 ```
 
 Run the following command to install dependencies:
 
 ```bash
-    yarn install
+yarn install
 ```
 
 Build the project using:
 
 ```bash
-    yarn run build
+yarn run build
 ```
 
 ## Usage
@@ -31,7 +31,7 @@ Build the project using:
 * Option 1: Launch the application using:
 
     ```bash
-        yarn run start
+    yarn run start
     ```
     
     and open https://localhost:3000/
