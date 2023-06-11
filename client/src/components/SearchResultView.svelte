@@ -32,23 +32,29 @@
 <p class="message">
   {"Degree of separation: " + toDisplay.degreeOfSeparation}
 </p>
+
 <p class="message">
-  {"Connection path discovered: " + toDisplay.path}
+  {"Connection path: " + toDisplay.path}
 </p>
+
 <p class="message">
-  {"Requests done: " + toDisplay.requestsDone}
+  {"Requests performed: " + toDisplay.requestsDone}
 </p>
+
 <p class="message">
   {"Unique profiles fetched: " + toDisplay.uniqueProfilesFetched}
 </p>
+
 <p class="message">
   {"Search duration: " + toDisplay.searchDuration}
 </p>
+
 {#if toDisplay.tooManyRequests === true}
   <p class="message">
     Daily requests limit have been exhausted
   </p>
 {/if}
+
 {#if Array.isArray(data.path)}
   <ConnectionPathView {apiKey} steamIds={data.path} />
 {/if}
