@@ -1,17 +1,10 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es2021",
-    "allowJs": false,
-    "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "es2022",
     "moduleResolution": "node",
     "isolatedModules": true,
-    "alwaysStrict": true,
     "sourceMap": true,
     "rootDir": "src",
     "outDir": "dist"
